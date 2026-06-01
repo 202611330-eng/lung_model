@@ -11,9 +11,9 @@ import joblib  # 👈 파일을 불러오기 위해 꼭 필요합니다!
 @st.cache_resource  # 모델을 한 번만 불러오도록 속도를 최적화합니다.
 def load_saved_files():
     # 예: 'C:/streamlit/scaler.pkl' 처럼 전체 경로를 적으셔도 됩니다.
-    scaler = joblib.load('scaler.pkl')      # 스케일러 파일 불러오기
-    model = joblib.load('model.pkl')        # 학습된 모델 파일 불러오기
-    df = pd.read_csv('lung_data.csv')       # 원본 데이터(CSV) 불러오기
+    scaler = joblib.load('lung_scaler.pkl')      # 스케일러 파일 불러오기
+    model = joblib.load('lung_model.pkl')        # 학습된 모델 파일 불러오기
+    df = pd.read_csv('lung.csv')       # 원본 데이터(CSV) 불러오기
     return scaler, model, df
 
 # 위 함수를 실행하여 파일들을 실제로 변수에 할당합니다.
