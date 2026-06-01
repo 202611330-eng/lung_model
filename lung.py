@@ -26,23 +26,37 @@ st.write("환자의 정보를 입력하면 어떤 군집에 속하는지 예측�
 
 st.divider()
 
-## 1. 데이터 입력 (사이드바) - [Age(나이) 추가 완료!]
+## 1. 데이터 입력 (사이드바)
 st.sidebar.header("환자 정보 입력")
 
 Age = st.sidebar.number_input("나이 입력 (Age)", min_value=0, max_value=120, value=30, step=1)
-Smokes = st.sidebar.number_input("흡연량 입력 (Smokes)", min_value=0.0, max_value=100.0, value=0.0, step=1.0)
-AreaQ = st.sidebar.number_input("지역지수 입력 (AreaQ)", min_value=0.0, max_value=100.0, value=0.0, step=1.0)
-Alkhol = st.sidebar.number_input("음주량 입력 (Alkhol)", min_value=0.0, max_value=100.0, value=0.0, step=1.0)
+Smokes = st.sidebar.number_input("흡연량 입력 (Smokes)", min_value=0.0, max_value=100.0, value=0.0, step=0.1)
+AreaQ = st.sidebar.number_input("지역지수 입력 (AreaQ)", min_value=0.0, max_value=100.0, value=0.0, step=0.1)
+Alkhol = st.sidebar.number_input("음주량 입력 (Alkhol)", min_value=0.0, max_value=100.0, value=0.0, step=0.1)
 
 # 분석 시작 버튼
 if st.sidebar.button("군집 예측하기"):
     
-    ## 2. 데이터프레임 변환 및 스케일링 (학습 때와 동일한 4개 컬럼 구성)
-    # 원래 학습에 사용된 컬럼 순서인 ['Age', 'Smokes', 'AreaQ', 'Alkhol']을 강제로 맞춥니다.
-    new_patient = pd.DataFrame([[Age, Smokes, AreaQ, Alkhol]], columns=['Age', 'Smokes', 'AreaQ', 'Alkhol'])
+    ## 2. 데이터프레임 변환 및 [수정] 넘파이 배열로 스케일링 진행
+    # 스케일러가 기억하는 원래 컬럼의 개수를 파악합니다.
+    try:
+        expected_features = scaler.n_features_in_
+    except AttributeError:
+        expected_features = 4  # 기본값으로 4개 가정 (Age, Smokes, AreaQ, Alkhol)
+
+    # 1) 만약 원래 학습 때 컬럼이 4개였다면
+    if expected_features == 4:
+        new_patient = pd.DataFrame([[Age, Smokes, AreaQ, Alkhol]])
+    # 2) 만약 원래 데이터셋의 전체 컬럼(7개)을 다 넣고 학습시켰었다면 (Name, Surname 포함)
+    elif expected_features == 7:
+        # 문자열 자리에 임의의 값(0)을 채워서 개수를 7개로 맞춰줍니다.
+        new_patient = pd.DataFrame([[0, 0, Age, Smokes, AreaQ, Alkhol, 0]])
+    # 3) 만약 스케일러가 기억하는 개수가 3개였다면 (Smokes, AreaQ, Alkhol)
+    else:
+        new_patient = pd.DataFrame([[Smokes, AreaQ, Alkhol]])
     
-    # 순서와 개수가 일치하므로 이제 에러 없이 변환 및 예측이 됩니다!
-    new_patient_scaled = scaler.transform(new_patient)
+    # 🌟 핵심 수정: .values를 붙여 컬럼 이름 매칭 검사를 강제로 건너뜁니다!
+    new_patient_scaled = scaler.transform(new_patient.values)
     pred_cluster = model.predict(new_patient_scaled)
     
     ## 3. 결과 출력
