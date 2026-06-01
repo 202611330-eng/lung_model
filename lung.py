@@ -9,9 +9,9 @@ import joblib
 # ====================================================================
 @st.cache_resource
 def load_saved_files():
-    scaler = joblib.load('scaler.pkl')      # 스케일러 파일 불러오기
-    model = joblib.load('model.pkl')        # 학습된 모델 파일 불러오기
-    df = pd.read_csv('lung_data.csv')       # 원본 데이터(CSV) 불러오기
+    scaler = joblib.load('lung_scaler.pkl')      # 스케일러 파일 불러오기
+    model = joblib.load('lung_model.pkl')        # 학습된 모델 파일 불러오기
+    df = pd.read_csv('lung.csv')       # 원본 데이터(CSV) 불러오기
     return scaler, model, df
 
 try:
@@ -30,9 +30,9 @@ st.divider()
 st.sidebar.header("환자 정보 입력")
 
 Age = st.sidebar.number_input("나이 입력 (Age)", min_value=0, max_value=120, value=30, step=1)
-Smokes = st.sidebar.number_input("흡연량 입력 (Smokes)", min_value=0.0, max_value=100.0, value=0.0, step=0.1)
-AreaQ = st.sidebar.number_input("지역지수 입력 (AreaQ)", min_value=0.0, max_value=100.0, value=0.0, step=0.1)
-Alkhol = st.sidebar.number_input("음주량 입력 (Alkhol)", min_value=0.0, max_value=100.0, value=0.0, step=0.1)
+Smokes = st.sidebar.number_input("흡연량 입력 (Smokes)", min_value=0.0, max_value=100.0, value=0.0, step=1.0)
+AreaQ = st.sidebar.number_input("지역지수 입력 (AreaQ)", min_value=0.0, max_value=100.0, value=0.0, step=1.0)
+Alkhol = st.sidebar.number_input("음주량 입력 (Alkhol)", min_value=0.0, max_value=100.0, value=0.0, step=1.0)
 
 # 분석 시작 버튼
 if st.sidebar.button("군집 예측하기"):
