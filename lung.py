@@ -65,27 +65,41 @@ if st.sidebar.button("군집 예측하기"):
     
     st.divider()
     
-    ## 4. 산점도 시각화
-    st.subheader("📊 군집 분포도 내 환자 위치")
-    
-    # 한글 깨짐 방지
-    plt.rc('font', family='Malgun Gothic') 
-    plt.rcParams['axes.unicode_minus'] = False
-    
-    fig, ax = plt.subplots(figsize=(8, 6))
-    
-    # 데이터셋의 군집 번호가 'Result' 컬럼에 있으므로 이를 색상(c)으로 지정합니다.
-    cluster_column = 'Result' if 'Result' in df.columns else 'cluster'
-    
-    scatter = ax.scatter(df['Smokes'], df['Alkhol'], c=df[cluster_column], alpha=0.5, cmap='viridis')
-    
-    # 새 환자 표시 (X 기호)
-    ax.scatter(Smokes, Alkhol, c='red', s=300, marker='X', label='New Patient')
-    
-    ax.set_xlabel('흡연량 (Smokes)')
-    ax.set_ylabel('음주량 (Alkhol)')
-    ax.legend()
-    ax.grid(True, linestyle='--', alpha=0.6)
-    
-    # 스트림릿에 plot 표시
-    st.pyplot(fig)
+   ## 4. 산점도 시각화
+st.subheader("📊 군집 분포도 내 환자 위치")
+
+# 🌟 [수정] 폰트 파일 직접 로드 방식
+import matplotlib.font_manager as fm
+import os
+
+font_path = "NanumGothic.ttf"  # 같은 폴더에 있는 폰트 파일명
+
+if os.path.exists(font_path):
+    font_prop = fm.FontProperties(fname=font_path)
+    # 개별 요소에 fontproperties를 지정합니다.
+else:
+    # 폰트 파일이 없을 경우 기본 폰트 사용 (에러 방지)
+    font_prop = fm.FontProperties()
+    st.warning("⚠️ NanumGothic.ttf 파일이 없어 한글이 깨질 수 있습니다.")
+
+plt.rcParams['axes.unicode_minus'] = False
+
+fig, ax = plt.subplots(figsize=(8, 6))
+
+# 데이터셋의 군집 번호가 'Result' 컬럼에 있으므로 이를 색상(c)으로 지정합니다.
+cluster_column = 'Result' if 'Result' in df.columns else 'cluster'
+
+scatter = ax.scatter(df['Smokes'], df['Alkhol'], c=df[cluster_column], alpha=0.5, cmap='viridis')
+
+# 새 환자 표시 (X 기호)
+ax.scatter(Smokes, Alkhol, c='red', s=300, marker='X', label='New Patient')
+
+# 🌟 [수정] 한글이 들어가는 곳에 fontproperties=font_prop 추가
+ax.set_xlabel('흡연량 (Smokes)', fontproperties=font_prop, fontsize=12)
+ax.set_ylabel('음주량 (Alkhol)', fontproperties=font_prop, fontsize=12)
+ax.set_title('환자 군집 분포도', fontproperties=font_prop, fontsize=15) # 제목 추가시
+ax.legend()
+ax.grid(True, linestyle='--', alpha=0.6)
+
+# 스트림릿에 plot 표시
+st.pyplot(fig)
